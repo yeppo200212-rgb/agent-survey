@@ -1,0 +1,11 @@
+{
+  "name": "agent-survey",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "dev:backend": "npm run dev -w packages/backend",
+    "build:backend": "npm run build -w packages/backend",
+    "migrate": "npm run migrate -w packages/backend"
+  }
+}
