@@ -35,11 +35,11 @@ export interface Agent {
 }
 
 export interface ScoreBreakdown {
-  textAnalysis: number;   // 0-40
-  processingTime: number; // 0-10
-  coherence: number;      // 0-20
+  textAnalysis: number;   // 0-50
+  speedPenalty: number;   // -10 or 0 (조작 탐지 전용)
+  coherence: number;      // 0-25
   uniqueness: number;     // 0-20
-  history: number;        // 0-10
+  history: number;        // 0-15
 }
 
 export interface ScoreResult {
@@ -47,21 +47,21 @@ export interface ScoreResult {
   breakdown: ScoreBreakdown;
 }
 
-// --- Text Analysis (40pts) ---
+// --- Text Analysis (50pts) ---
 function scoreTextAnalysis(answers: AnswerEntry[], questions: SurveyQuestion[]): number {
   let score = 0;
 
-  // Reasoning length score (15pts)
+  // Reasoning length score (20pts)
   const totalReasoningChars = answers.reduce((acc, a) => acc + (a.reasoning?.length || 0), 0);
   if (totalReasoningChars >= 200) {
-    score += 15;
+    score += 20;
   } else if (totalReasoningChars >= 100) {
-    score += 8;
+    score += 11;
   } else if (totalReasoningChars >= 50) {
-    score += 4;
+    score += 5;
   }
 
-  // Keyword overlap between question text and reasoning (0-15pts)
+  // Keyword overlap between question text and reasoning (0-20pts)
   const questionMap = new Map(questions.map((q) => [q.id, q]));
   let totalOverlapScore = 0;
   let answerCount = 0;
@@ -91,7 +91,7 @@ function scoreTextAnalysis(answers: AnswerEntry[], questions: SurveyQuestion[]):
 
   if (answerCount > 0) {
     const avgOverlap = totalOverlapScore / answerCount;
-    score += Math.round(avgOverlap * 15);
+    score += Math.round(avgOverlap * 20);
   }
 
   // Penalty for repetitive phrases (-10pts)
@@ -100,7 +100,7 @@ function scoreTextAnalysis(answers: AnswerEntry[], questions: SurveyQuestion[]):
     score = Math.max(0, score - 10);
   }
 
-  return Math.min(40, Math.max(0, score));
+  return Math.min(50, Math.max(0, score));
 }
 
 function hasRepetitivePhrases(text: string): boolean {
@@ -117,21 +117,17 @@ function hasRepetitivePhrases(text: string): boolean {
   return false;
 }
 
-// --- Processing Time (10pts) ---
-function scoreProcessingTime(processingMs: number | null): number {
+// --- Speed Penalty (-10 or 0) ---
+// 에이전트 성능(하드웨어/모델 크기)은 처리 시간과 무관하므로 보상 기능 제거.
+// 500ms 미만 응답만 조작 의심으로 페널티. 그 외 중립.
+function scoreSpeedPenalty(processingMs: number | null): number {
   if (processingMs === null || processingMs === undefined) {
-    return 5; // Unknown — neutral
+    return 0; // 알 수 없음 — 중립
   }
-  if (processingMs < 2000) {
-    return 0; // Too fast — likely gaming
+  if (processingMs < 500) {
+    return -10; // 사전 생성 응답 의심
   }
-  if (processingMs <= 30000) {
-    return 10; // Ideal: 2s–30s
-  }
-  if (processingMs <= 300000) {
-    return 7; // Up to 5 minutes
-  }
-  return 4; // Over 5 minutes — slow but counted
+  return 0;
 }
 
 // --- Coherence (20pts) ---
@@ -192,10 +188,10 @@ function scoreCoherence(answers: AnswerEntry[], questions: SurveyQuestion[]): nu
     }
   }
 
-  if (scorableAnswers === 0) return 10; // No scorable answers — neutral
+  if (scorableAnswers === 0) return 12; // No scorable answers — neutral
 
   const ratio = totalScore / scorableAnswers;
-  return Math.round(ratio * 20);
+  return Math.round(ratio * 25);
 }
 
 // --- Uniqueness (20pts) ---
@@ -232,10 +228,10 @@ function scoreUniqueness(
   return Math.round(ratio * 20);
 }
 
-// --- History (10pts) ---
+// --- History (15pts) ---
 function scoreHistory(agent: Agent): number {
   const score = Math.max(0, Math.min(100, Number(agent.quality_score) || 50));
-  return Math.round((score / 100) * 10 * 10) / 10; // round to 1 decimal
+  return Math.round((score / 100) * 15 * 10) / 10; // round to 1 decimal
 }
 
 // --- Main scorer ---
@@ -252,18 +248,18 @@ export async function scoreResponse(params: {
     : [];
 
   const textAnalysis = scoreTextAnalysis(response.answers, questions);
-  const processingTime = scoreProcessingTime(response.processing_ms);
+  const speedPenalty = scoreSpeedPenalty(response.processing_ms);
   const coherence = scoreCoherence(response.answers, questions);
   const uniqueness = scoreUniqueness(response, allResponsesForSurvey);
   const history = scoreHistory(agent);
 
-  const total = Math.min(100, Math.round(textAnalysis + processingTime + coherence + uniqueness + history));
+  const total = Math.min(100, Math.max(0, Math.round(textAnalysis + speedPenalty + coherence + uniqueness + history)));
 
   return {
     total,
     breakdown: {
       textAnalysis,
-      processingTime,
+      speedPenalty,
       coherence,
       uniqueness,
       history,
