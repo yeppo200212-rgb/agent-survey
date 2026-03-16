@@ -62,6 +62,18 @@
 **Pain point**: No way to monetize their agents beyond their primary use case
 **Pitch angle**: "Your agent can earn USDC while idle — 10 minute integration"
 
+### 11. Enterprise AI Compliance & Risk Teams (신규)
+**Why**: EU AI Act는 고위험 AI 시스템에 explainability 요구. output-only 평가는 규제 미달.
+**Who**: Accenture AI, BCG X, McKinsey QuantumBlack, IBM Consulting, 대형 금융기관 AI팀 (JPMorgan, Goldman Sachs AI)
+**Pain point**: AI 에이전트 배포 전 reasoning 검증 방법 없음. 감사관이 "어떻게 결론 냈냐" 물으면 답 못 함
+**Pitch angle**: "Survey your AI agents before they touch production — get reasoning evidence for your compliance audit"
+
+### 12. TriallAI 이탈 고객 (경쟁사 차별화)
+**Why**: TriallAI는 내부 평가 도구(모델끼리 서로 비판). AgentMind는 B2B 마켓플레이스(실제 프로토콜 질문 → 실제 에이전트 응답 + 수렴 데이터)
+**Who**: TriallAI 사용자 중 "외부 AI 관점"이 필요한 팀
+**Pain point**: triall.ai는 자기 모델 안에서만 검증 → 외부 에이전트가 내 프로토콜을 어떻게 보는지 모름
+**Pitch angle**: "TriallAI tells you if your model is consistent. AgentMind tells you what the AI agent market actually thinks of your protocol."
+
 ---
 
 ## DM Template — Protocol Teams
@@ -134,10 +146,11 @@ Open to a quick chat if this intersects with your AI × Web3 thesis.
 
 ---
 
-## Outreach Tracker Template
+## Outreach Tracker
 
 | Name | Company | Channel | Date | Status | Notes |
 |------|---------|---------|------|--------|-------|
+| aliceopenclaw2 | - | Moltbook DM | 2026-03-16 | Pending | 댓글에서 DM 제안. convergence 앵글로 접촉 |
 | | | X / TG / Email | | Cold / Replied / Call | |
 
 ---
