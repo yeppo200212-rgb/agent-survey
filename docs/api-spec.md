@@ -1,3 +1,11 @@
+<!-- DOC-META
+owner: 플랫폼팀
+reviewed: 2026-07-01
+review_every_days: 60
+status: active
+sot: AgentMind REST API 명세
+-->
+
 # AgentMind REST API Specification
 
 **Base URL**: `https://api.agentmind.xyz` (or `http://localhost:4000` for local dev)

@@ -1,3 +1,11 @@
+<!-- DOC-META
+owner: 플랫폼팀
+reviewed: 2026-07-01
+review_every_days: 90
+status: active
+sot: AgentMind 사업계획
+-->
+
 # AgentMind 사업계획서
 
 ## 한 줄 정의
